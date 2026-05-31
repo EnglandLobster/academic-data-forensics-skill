@@ -1,0 +1,4 @@
+interface:
+  display_name: "Academic Data Forensics"
+  short_description: "Audit academic numeric data for reproducible anomalies"
+  default_prompt: "Use $academic-data-forensics to audit an academic paper or supplementary dataset for numeric anomalies and produce a reproducible evidence report."
