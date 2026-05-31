@@ -1,77 +1,90 @@
-# Academic Data Forensics Skill
+# 学术打假 Skill: Academic Data Forensics
 
-Academic Data Forensics is a Codex skill for conservative academic numeric forensics. It helps review papers, supplements, raw exports, figures, author replies, and corrected datasets for reproducible anomalies that may require author explanation, editorial review, or institutional follow-up.
+这是一个用于 Codex 的学术打假 skill，面向论文、补充数据、原始仪器导出、图像、作者回应和更正数据中的数字异常取证。
 
-The skill is designed for evidence preparation, not for declaring misconduct. Its default language is cautious: findings are treated as numeric or source-data anomalies until they are explained, reproduced, or reviewed by the appropriate human process.
+最近，因“耿同学讲故事”等公共讨论，论文数据异常、学术造假举报、科研诚信审查再次成为热点。这个 skill 的目标不是替代调查委员会下结论，而是把“看起来很怪”的数据问题拆成可复核、可追溯、可解释的证据链，让学术打假从情绪判断走向结构化取证。
 
-## What It Does
+## 这个 Skill 解决什么问题
 
-- Preserves original source artifacts and records provenance before analysis.
-- Extracts observations into structured evidence with source location, raw strings, parsed values, units, groups, panels, and sample identifiers where available.
-- Requires panel and data-type classification before any detector is selected.
-- Guides detector choice by semantics: raw replicates, summary statistics, percentages, time series, standard curves, image quantification, author responses, and corrected files are handled differently.
-- Produces reviewable evidence objects and reports with source locations, raw values, detector logic, caveats, and alternative explanations.
+学术打假的难点不只是“发现几个异常数字”，而是判断这些数字是否真的违背实验语义、测量过程和论文声明。
 
-## Core Principle
+这个 skill 会引导 Codex：
 
-Do not run a generic whole-sheet scanner as the primary analysis.
+- 保留原始材料，不破坏 PDF、补充表、图片、原始导出、作者回复和更正文件。
+- 记录来源、版本、文件哈希、页码、图号、panel、sheet、range、行列位置和原始数字字符串。
+- 先识别数据块语义，再选择检测方法。
+- 区分原始重复实验、汇总统计量、百分比、时间序列、标准曲线、图像定量、作者回应和更正数据。
+- 输出可复核证据对象，而不是只给一句“像是造假”。
+- 在报告里列出可能的良性解释，比如四舍五入、仪器分辨率、标准曲线、归一化、共用对照、配对样本等。
 
-Academic supplementary spreadsheets often mix figure labels, panel titles, group names, raw observations, derived values, time points, percentages, standard curves, and summary statistics in the same sheet. Scanning everything together creates false positives and hides the actual evidence path.
+## 核心原则
 
-The workflow is:
+不要把整张补充表直接丢给通用扫描器。
 
-1. Preserve sources.
-2. Build structured data with provenance.
-3. Classify panels before testing.
-4. Select detectors by data semantics.
-5. Add domain and measurement-process context.
-6. Produce evidence objects and a cautious report.
+很多论文补充表会把 panel 标题、组别标签、时间点、原始值、派生值、百分比、标准曲线、统计摘要混在一起。全表扫描会制造大量假阳性，也会掩盖真正值得追踪的证据。
 
-## Detector Families
+正确流程是：
 
-The skill includes a detector catalog covering:
+1. 保留来源材料。
+2. 构建带 provenance 的结构化数据。
+3. 先按 figure/panel/table 对数据块分类。
+4. 根据数据语义选择检测器。
+5. 结合实验设计、测量过程和领域常识解释异常。
+6. 输出证据对象和谨慎报告。
 
-- last-digit and precision anomalies
-- exact, near, vector, and block duplication
-- structured block similarity across groups, doses, batches, and time points
-- constant differences, ratios, linear relationships, and arithmetic patterns
-- percentage, count, denominator, mean, SD, SEM, CI, p-value, and formula consistency checks
-- measurement-resolution and biological feasibility checks
-- author-response and corrected-data consistency checks
-- sample-size, missingness, unit, and range checks
+一句话：先理解数据是什么，再判断数字怪不怪。
 
-Each detector is framed with caveats because many academic datasets contain legitimate structure from instruments, rounding policies, normalization, paired samples, reused controls, standard curves, or derived quantities.
+## 能检查哪些异常
 
-## Evidence Model
+内置参考文档覆盖多类学术打假常见信号：
 
-The reference schema encourages each finding to include:
+- 末位数字、末两位数字、精度和小数尾部异常
+- 单元格、行、列、向量、跨表、跨实验的精确或近似重复
+- 条件组、剂量组、时间点、批次之间的结构化 block 相似
+- 恒定差值、恒定比例、近线性关系、等差或等比模式
+- 百分比、计数、分母、均值、SD、SEM、CI、p 值和公式一致性
+- 测量分辨率、实验可行性和生物学范围检查
+- 作者回应、更正数据与原始发表数据之间的连续性检查
+- 样本量、缺失值、单位、尺度和标签一致性检查
 
-- evidence id, type, and severity
-- paper metadata and source file versions
-- file, sheet, page, figure, panel, range, row, and column location
-- claim being evaluated
-- detector method, parameters, statistics, and software
-- raw values needed for reproduction
-- plausible benign explanations
-- human review status
+这些检测器不是“自动定罪器”。单个弱信号通常只能作为线索；多个独立高强度信号互相印证时，才值得升级为严肃问题。
 
-This keeps reports auditable and makes future reruns or peer review possible.
+## 证据对象
 
-## Installation
+这个 skill 鼓励每个发现都包含：
 
-Clone the repository into a Codex skills directory:
+- evidence id、异常类型和严重程度
+- 论文标题、DOI、来源文件和版本
+- 文件、sheet、页码、figure、panel、range、行列位置
+- 正在核查的论文声明
+- 检测器、参数、统计量和软件环境
+- 可复核的原始值
+- 可能的良性解释
+- 人工复核状态
+
+这样做的好处是：别人可以按同一条证据链复现你的判断，而不是只看到截图和情绪化结论。
+
+## 安装
+
+克隆到 Codex skills 目录：
 
 ```bash
 git clone https://github.com/EnglandLobster/academic-data-forensics-skill.git ~/.codex/skills/academic-data-forensics
 ```
 
-Then ask Codex to use the skill:
+使用时可以这样说：
 
 ```text
-Use $academic-data-forensics to audit this paper and its supplementary tables for numeric anomalies.
+使用 $academic-data-forensics 审计这篇论文和补充表，找出可复核的数字异常。
 ```
 
-## Repository Layout
+或：
+
+```text
+用学术打假 skill 看一下这个 source data，先做 panel 分类，再检查是否存在难以解释的重复、精度或公式一致性问题。
+```
+
+## 仓库结构
 
 ```text
 .
@@ -83,29 +96,34 @@ Use $academic-data-forensics to audit this paper and its supplementary tables fo
     `-- evidence_schema.md
 ```
 
-## Intended Use
+## 适合场景
 
-Use this skill for:
+- 论文数字异常初筛
+- 补充数据审计
+- PubPeer 风格证据准备
+- 作者回应和更正数据复核
+- 原始数据、仪器导出和论文图表之间的一致性检查
+- 科研诚信内部 triage 报告
 
-- academic numeric anomaly triage
-- paper and supplementary data review
-- PubPeer-style evidence preparation
-- author-response or corrected-data comparison
-- reproducible research-integrity reports
+## 不适合做什么
 
-Avoid using it as:
+- 不适合直接输出“某人造假”的最终结论
+- 不适合作为通用 Excel 全表扫描器
+- 不适合绕过期刊、数据库或非公开材料的访问限制
+- 不适合替代领域专家、编辑部、机构或调查委员会的正式判断
 
-- a misconduct verdict generator
-- a generic spreadsheet scanner
-- a substitute for domain review
-- a tool for bypassing journal access controls or non-public data boundaries
+## 推荐报告语言
 
-## Reporting Style
+推荐：
 
-Prefer language such as:
+- “公开补充表中存在如下数字模式……”
+- “该模式较难与文中描述的测量过程相协调……”
+- “建议作者提供原始仪器导出、分析脚本或样本级原始数据……”
 
-- "The public supplementary table contains..."
-- "This pattern is difficult to reconcile with..."
-- "Please provide the raw instrument export or analysis script..."
+避免：
 
-Avoid unsupported claims such as "this proves fabrication" unless an authorized investigation or explicit context supports that wording.
+- “这一定是造假”
+- “这个人肯定编数据”
+- “看到异常就可以定性”
+
+学术打假最有力量的地方，不是喊得更重，而是证据链更稳。
